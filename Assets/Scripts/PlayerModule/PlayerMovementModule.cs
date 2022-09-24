@@ -5,7 +5,9 @@ namespace Project.Runner {
     public class PlayerMovementModule : PlayerMobuleBase {
         
         #region Module Data
-
+        
+        public static PlayerMovementModule Instance { get; private set; }
+        
         public CinemachineVirtualCamera virtualCamera;
         Vector3 difference;
         Vector3 originalPosition;
@@ -15,7 +17,21 @@ namespace Project.Runner {
         
         public float moveSpeed;
         public DynamicJoystick dynamicJoystick;
+        /*CinemachineVirtualCamera vcam = ...;
+        var transposer = vcam.GetCinemachineComponent<CinemachineTransposer>();
+        transposer.m_FollowOffset = bla;*/
 
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
 
         public override void Initialize(PlayerMainModule mainModule) {
             base.Initialize(mainModule);
@@ -45,7 +61,7 @@ namespace Project.Runner {
         protected override void UnFixedUpdate() {
             base.UnFixedUpdate();
         }
-
+        
         
 
         private void FixedUpdate()

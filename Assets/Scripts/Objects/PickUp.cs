@@ -2,11 +2,12 @@ using System;
 using UnityEngine;
 using Interfaces;
 using DG.Tweening;
+using UnityEngine.UIElements;
 
 namespace Objects {
     public class PickUp : MonoBehaviour, IInteract {
         public static Action<bool, Transform> OnInteractNotTrigger;
-
+        public bool finishedPickingUp = false;
         private bool _isPickedUp;
         private Collider _collider;
 
@@ -32,6 +33,7 @@ namespace Objects {
 
         private void AddToStack() {
             _isPickedUp = true;
+            Debug.Log("asdad");
         }
 
         private void RemoveFromStack() {

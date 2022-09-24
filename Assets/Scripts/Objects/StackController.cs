@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 using Player;
+using Project.Runner;
 
 namespace Objects {
     public class StackController : MonoBehaviour {
@@ -30,27 +31,28 @@ namespace Objects {
             
         }
 
-        private void Update() {
-            // Simple fix for the child-parent-parent position relationship.
-            //transform.localPosition = new Vector3(0, _playerTransform.position.y * 1, 0);
-        }
-
         private void FixedUpdate() {
-           // WaveNodes();
-        }
-
-        public void TakeItAll() {
-               // when pickup a node take it to translate i
+            WaveNodes();
         }
 
         private void WaveNodes() {
+           
             for (int i = 1; i < _stack.Count; i++) {
+                if (!_stack[i].GetComponent<PickUp>().finishedPickingUp) {
+                    continue;
+                }
                 Vector3 nodePosition = _stack[i].localPosition;
-                Vector3 previousNodePosition = _stack[i - 1].localPosition;
-                nodePosition = new Vector3(
-                    Mathf.Lerp(nodePosition.x, previousNodePosition.x, Time.deltaTime * _lerpDuration),
-                    i * -_spaceBetweenNodes,
-                    nodePosition.z);
+                Vector3 moveVector = new Vector3(PlayerMovementModule.Instance.dynamicJoystick.Horizontal, 0, PlayerMovementModule.Instance.dynamicJoystick.Vertical);
+
+                nodePosition = Vector3.Lerp(nodePosition, new Vector3(nodePosition.x, nodePosition.y, (i * 0.11f) * -(moveVector.magnitude)), (_lerpDuration * i) * Time.deltaTime);
+
+
+                //Vector3 previousNodePosition = _stack[i - 1].localPosition;
+                
+                /*nodePosition = new Vector3(
+                    nodePosition.x,
+                    i * _spaceBetweenNodes,
+                    Mathf.Lerp(nodePosition.z, previousNodePosition.z, Time.deltaTime * _lerpDuration));*/
 
                 _stack[i].localPosition = nodePosition;
             }
@@ -59,13 +61,16 @@ namespace Objects {
             if (isPickedUp) {
                 
                 node.gameObject.GetComponent<Rigidbody>().isKinematic = true;
-                
+                _stack.Add(node);
+                float yPosition = _stack.Count * _spaceBetweenNodes;
                 node.DOJump(new Vector3(0,5f,0), 1f, 1, 1f).OnComplete(()=> {
-                    _stack.Add(node);
+                    
                     node.SetParent(_stackParent);
-                    node.DOLocalMove(Vector3.zero, 1f).OnComplete(()=> {
-                        node.localPosition = new Vector3(0,ListCount * _spaceBetweenNodes,0);
+                    
+                    node.DOLocalMove(new Vector3(0,yPosition,0), 1f).OnComplete(()=> {
+                        node.localPosition = new Vector3(0,yPosition,0);
                         node.localRotation = Quaternion.Euler(0,0,0);
+                        node.GetComponent<PickUp>().finishedPickingUp = true;
                     });
                     
                 });

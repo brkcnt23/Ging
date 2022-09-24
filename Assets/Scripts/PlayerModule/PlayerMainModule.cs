@@ -89,10 +89,6 @@ namespace Project.Runner {
             SetupPlayer();
         }
 
-        private void Start() {
-            
-        }
-
         private void Update() {
             for (int i = 0; i < modules.Count; i++) {
                 if(modules[i]._canProcess) {
